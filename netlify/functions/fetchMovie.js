@@ -1,5 +1,4 @@
 // netlify/functions/searchMovie.js
-const fetch = require("node-fetch");
 
 exports.handler = async (event) => {
   const movieName = event.queryStringParameters.query;
