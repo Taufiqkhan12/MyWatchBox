@@ -74,6 +74,33 @@ html {
   min-height: 10vh;
 }
 
+.filter {
+  margin: 1rem 0 0 4rem;
+}
+
+.stats label {
+  color: #fff;
+  font-size: medium;
+  margin-right: 1rem;
+}
+
+.stats select {
+  font-family: inherit;
+  color: inherit;
+  font-size: small;
+  padding: 0.4rem;
+  text-align: center;
+  border-radius: 4px;
+  transition: 0.3s;
+  color: #fff;
+  background-color: #2c2c2c;
+}
+
+.stats select:focus,
+.stats select:active {
+  border: 1px solid #1e1e1e !important;
+}
+
 .movie-list {
   display: flex;
   justify-content: center;

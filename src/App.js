@@ -3,6 +3,8 @@ import "./index.css";
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 
+const apiKey = process.env.REACT_APP_API_KEY;
+
 export default function App() {
   const [movies, setMovies] = useState(null);
   const [isAddMovieOpen, setIsAddMovieOpen] = useState(false);
@@ -10,6 +12,7 @@ export default function App() {
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [query, setQuery] = useState("");
   const [watchList, setWatchList] = useState([]);
+  const [filterBy, setFilterBy] = useState("all");
 
   function handleAddMovie() {
     if (isMovieDetailsOpen) setIsMovieDetailsOpen(false);
@@ -32,7 +35,6 @@ export default function App() {
   }
 
   function handleAddToWatchlist(currMovie) {
-    console.log(currMovie);
     if (watchList?.some((movie) => movie.id === currMovie.id)) return;
 
     setWatchList((list) => (list ? [...list, currMovie] : [currMovie]));
@@ -43,7 +45,10 @@ export default function App() {
       (movie) => movie.id !== currMovie.id
     );
 
-    if (updatedWatchlist) setWatchList(updatedWatchlist);
+    if (updatedWatchlist) {
+      setWatchList(updatedWatchlist);
+      setIsMovieDetailsOpen(false);
+    }
   }
 
   function handleMarkAsWatched(currMovie) {
@@ -54,10 +59,14 @@ export default function App() {
     setWatchList(updatedData);
   }
 
+  function handleFilter(value) {
+    setFilterBy(value);
+  }
+
   const handleMovie = useCallback(async (movieName) => {
     try {
       const res = await axios.get(
-        `https://api.themoviedb.org/3/search/movie?query=${movieName}&api_key=22b613515df2a6e9d9b9e56dc3df75b9`
+        `https://api.themoviedb.org/3/search/movie?query=${movieName}&api_key=${apiKey}`
       );
 
       const fetchedMovies = res.data.results.map(
@@ -81,7 +90,6 @@ export default function App() {
       );
 
       setMovies(fetchedMovies);
-      console.log(fetchedMovies);
     } catch (error) {
       console.error("Error fetching movies:", error);
     }
@@ -92,12 +100,18 @@ export default function App() {
       <div className="left-section">
         <Header onAddMovie={handleAddMovie} />
         <hr className="grey-line" />
-        <Stats />
+        <Stats
+          watchList={watchList}
+          filterBy={filterBy}
+          setFilterBy={setFilterBy}
+          handleFilter={handleFilter}
+        />
         <MovieListBox
           onMovieDetails={handleMovieDetails}
           watchList={watchList}
           onRemove={handleRemoveFromWatchlist}
           onMarkAsWatched={handleMarkAsWatched}
+          filterBy={filterBy}
         />
       </div>
 
@@ -133,8 +147,21 @@ function Header({ onAddMovie }) {
   );
 }
 
-function Stats() {
-  return <div className="stats"></div>;
+function Stats({ watchList, filterBy, handleFilter }) {
+  return watchList.length !== 0 ? (
+    <div className="stats">
+      <div className="filter">
+        <label>Filter by:</label>
+        <select value={filterBy} onChange={(e) => handleFilter(e.target.value)}>
+          <option value="all">All </option>
+          <option value="watched">Watched</option>
+          <option value="not watched">Not Watched</option>
+        </select>
+      </div>
+    </div>
+  ) : (
+    <div className="stats"></div>
+  );
 }
 
 function MovieListBox({
@@ -142,10 +169,21 @@ function MovieListBox({
   watchList,
   onRemove,
   onMarkAsWatched,
+  filterBy,
 }) {
+  let watchListMovies = watchList;
+
+  if (filterBy === "all") watchListMovies = watchList;
+
+  if (filterBy === "watched")
+    watchListMovies = watchList.filter((movie) => movie.watched === true);
+
+  if (filterBy === "not watched")
+    watchListMovies = watchList.filter((movie) => movie.watched === false);
+
   return watchList.length !== 0 ? (
     <div className="movie-list">
-      {watchList?.map((movie) => (
+      {watchListMovies?.map((movie) => (
         <MovieBox
           key={movie.id}
           id={movie.id}
