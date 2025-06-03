@@ -1,3 +1,3 @@
-# FilmDeck
+# My Watch Box
 
 A Movie Watchlist app where user can create their own movie watchlist.
