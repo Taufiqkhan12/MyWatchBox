@@ -3,8 +3,6 @@ import "./index.css";
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 
-const apiKey = process.env.REACT_APP_API_KEY;
-
 export default function App() {
   const [movies, setMovies] = useState(null);
   const [isAddMovieOpen, setIsAddMovieOpen] = useState(false);
@@ -66,7 +64,7 @@ export default function App() {
   const handleMovie = useCallback(async (movieName) => {
     try {
       const res = await axios.get(
-        `https://api.themoviedb.org/3/search/movie?query=${movieName}&api_key=${apiKey}`
+        `/.netlify/functions/searchMovie?query=${movieName}`
       );
 
       const fetchedMovies = res.data.results.map(
