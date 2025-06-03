@@ -64,7 +64,7 @@ export default function App() {
   const handleMovie = useCallback(async (movieName) => {
     try {
       const res = await axios.get(
-        `/.netlify/functions/searchMovie?query=${movieName}`
+        `/.netlify/functions/fetchMovie?query=${movieName}`
       );
 
       const fetchedMovies = res.data.results.map(
